@@ -1,12 +1,10 @@
 package server
 
 import (
+	pb "cqrs-grpc-test/api/contactpb"
 	"cqrs-grpc-test/models"
 	"net"
 	"time"
-
-	pb "cqrs-grpc-test/api/contactpb"
-	service "cqrs-grpc-test/cmd/server/service"
 
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
@@ -26,18 +24,11 @@ const (
 	gRPCTime          = 10
 )
 
-func (s *server) newWriterGrpcServer(model *models.Models) (func() error, *grpc.Server, error) {
-	l, err := net.Listen("tcp", s.cfg.GRPC.Port)
+func (s *server) newWriterGrpcServer(model *models.Models, server string, port string) (func() error, *grpc.Server, error) {
+
+	l, err := net.Listen("tcp", port)
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "net.Listen")
-	}
-
-	readService := &service.ReadService{
-		Models: model,
-	}
-
-	writeService := &service.WriteService{
-		Models: model,
 	}
 
 	grpcServer := grpc.NewServer(
@@ -56,11 +47,20 @@ func (s *server) newWriterGrpcServer(model *models.Models) (func() error, *grpc.
 		),
 		),
 	)
-	pb.RegisterWriteContactServiceServer(grpcServer, writeService)
-	pb.RegisterReadContactServiceServer(grpcServer, readService)
-
+	if server == "write" {
+		writeService := &WriteService{
+			Models: model,
+		}
+		pb.RegisterWriteContactServiceServer(grpcServer, writeService)
+	}
+	if server == "read" {
+		readService := &ReadService{
+			Models: model,
+		}
+		pb.RegisterReadContactServiceServer(grpcServer, readService)
+	}
 	go func() {
-		s.log.Infof("gRPC server is listening on port: %s", s.cfg.GRPC.Port)
+		s.log.Infof("gRPC server is listening on port: %s", port)
 		s.log.Fatal(grpcServer.Serve(l))
 	}()
 

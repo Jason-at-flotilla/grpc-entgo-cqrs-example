@@ -1,4 +1,4 @@
-package service
+package main
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 )
 
 func ListContact() (conn *grpc.ClientConn, c pb.ReadContactServiceClient, url string, err error) {
-	addr := fmt.Sprintf("172.17.0.1:5002")
+	addr := fmt.Sprintf("172.17.0.1:5001")
 
 	conn, err = grpc.Dial(addr, grpc.WithInsecure())
 	if err != nil {
@@ -30,7 +30,7 @@ func ListContact() (conn *grpc.ClientConn, c pb.ReadContactServiceClient, url st
 		},
 		Filter: &pb.ListContactReq_Filter{},
 	})
-	fmt.Println(resp.Total)
+	fmt.Println(resp)
 
 	if err != nil {
 		return
@@ -40,7 +40,7 @@ func ListContact() (conn *grpc.ClientConn, c pb.ReadContactServiceClient, url st
 }
 
 func GetContact() (conn *grpc.ClientConn, c pb.ReadContactServiceClient, url string, err error) {
-	addr := fmt.Sprintf("172.17.0.1:5002")
+	addr := fmt.Sprintf("172.17.0.1:5001")
 
 	conn, err = grpc.Dial(addr, grpc.WithInsecure())
 	if err != nil {

@@ -1,6 +1,9 @@
 serviceName: service
-grpc:
+grpc_write:
   port: :5002
+  development: true
+grpc_read:
+  port: :5001
   development: true
 logger:
   level: debug

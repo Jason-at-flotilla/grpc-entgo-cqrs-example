@@ -19,6 +19,6 @@ func main() {
 	appLogger.WithName(cfg.ServiceName)
 
 	s := server.NewServer(appLogger, cfg)
-	appLogger.Fatal(s.Run())
+	appLogger.Fatal(s.Run("read"))
 
 }

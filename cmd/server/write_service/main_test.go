@@ -1,4 +1,4 @@
-package service
+package main
 
 import (
 	"context"
@@ -22,13 +22,13 @@ func CreateContact() (conn *grpc.ClientConn, c pb.WriteContactServiceClient, url
 	// md := metadata.New(map[string]string{"authorization": "Bearer +mytest2"})
 	// ctx := metadata.NewOutgoingContext(context.Background(), md)
 
-	activity, err := c.Create(context.Background(), &pb.CreateContactReq{
+	resp, err := c.Create(context.Background(), &pb.CreateContactReq{
 		Item: &pb.ContactItem{
 			Name:  "jason_test",
 			Phone: "0912-123-456",
 		},
 	})
-	fmt.Println(activity)
+	fmt.Println(resp)
 	if err != nil {
 		return
 	}

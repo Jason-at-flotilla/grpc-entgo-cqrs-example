@@ -17,9 +17,9 @@ import (
 	"syscall"
 
 	_ "github.com/lib/pq"
+	"github.com/pkg/errors"
 
 	"github.com/go-playground/validator"
-	"github.com/pkg/errors"
 )
 
 type server struct {
@@ -36,7 +36,7 @@ func NewServer(log logger.Logger, cfg *config.Config) *server {
 	return &server{log: log, cfg: cfg, v: validator.New()}
 }
 
-func (s *server) Run() error {
+func (s *server) Run(server string) error {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
 	defer cancel()
 
@@ -66,15 +66,25 @@ func (s *server) Run() error {
 	}
 
 	models := GetModel(entclient)
+	if server == "read" {
+		closeGrpcServer, grpcServer, err := s.newWriterGrpcServer(models, server, s.cfg.GRPC_READ.Port)
+		if err != nil {
+			return errors.Wrap(err, "NewScmGrpcServer")
+		}
+		defer closeGrpcServer() // nolint: errcheck
 
-	closeGrpcServer, grpcServer, err := s.newWriterGrpcServer(models)
-	if err != nil {
-		return errors.Wrap(err, "NewScmGrpcServer")
+		<-ctx.Done()
+		grpcServer.GracefulStop()
+	} else {
+		closeGrpcServer, grpcServer, err := s.newWriterGrpcServer(models, server, s.cfg.GRPC_WRITE.Port)
+		if err != nil {
+			return errors.Wrap(err, "NewScmGrpcServer")
+		}
+		defer closeGrpcServer() // nolint: errcheck
+
+		<-ctx.Done()
+		grpcServer.GracefulStop()
 	}
-	defer closeGrpcServer() // nolint: errcheck
-
-	<-ctx.Done()
-	grpcServer.GracefulStop()
 
 	return nil
 }

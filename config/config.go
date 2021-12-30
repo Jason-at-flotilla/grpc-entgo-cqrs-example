@@ -22,7 +22,8 @@ func init() {
 type Config struct {
 	ServiceName     string           `mapstructure:"serviceName"`
 	Logger          *logger.Config   `mapstructure:"logger"`
-	GRPC            GRPC             `mapstructure:"grpc"`
+	GRPC_READ       GRPC             `mapstructure:"grpc_read"`
+	GRPC_WRITE      GRPC             `mapstructure:"grpc_Write"`
 	Postgresql      *postgres.Config `mapstructure:"postgres"`
 	Redis           *redis.Config    `mapstructure:"redis"`
 	ServiceSettings ServiceSettings  `mapstructure:"serviceSettings"`
@@ -70,7 +71,7 @@ func InitConfig() (*Config, error) {
 
 	grpcPort := os.Getenv(constants.GrpcPort)
 	if grpcPort != "" {
-		cfg.GRPC.Port = grpcPort
+		cfg.GRPC_READ.Port = grpcPort
 	}
 	postgresHost := os.Getenv(constants.PostgresqlHost)
 	if postgresHost != "" {
