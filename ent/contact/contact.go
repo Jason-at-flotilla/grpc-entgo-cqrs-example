@@ -4,6 +4,8 @@ package contact
 
 import (
 	"time"
+
+	"github.com/google/uuid"
 )
 
 const (
@@ -11,6 +13,8 @@ const (
 	Label = "contact"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldUUID holds the string denoting the uuid field in the database.
+	FieldUUID = "uuid"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
 	// FieldPhone holds the string denoting the phone field in the database.
@@ -26,6 +30,7 @@ const (
 // Columns holds all SQL columns for contact fields.
 var Columns = []string{
 	FieldID,
+	FieldUUID,
 	FieldName,
 	FieldPhone,
 	FieldCreateTime,
@@ -43,6 +48,8 @@ func ValidColumn(column string) bool {
 }
 
 var (
+	// DefaultUUID holds the default value on creation for the "uuid" field.
+	DefaultUUID func() uuid.UUID
 	// DefaultCreateTime holds the default value on creation for the "create_time" field.
 	DefaultCreateTime func() time.Time
 	// DefaultUpdateTime holds the default value on creation for the "update_time" field.

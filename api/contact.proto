@@ -9,7 +9,7 @@ import "contact_message.proto";
 
 service ReadContactService {
   rpc Get(GetContactReq) returns (GetContactResp) {}
-  rpc GetList(GetListContactReq) returns (GetListContactResp) {}
+  rpc List(ListContactReq) returns (ListContactResp) {}
 }
 
 service WriteContactService {

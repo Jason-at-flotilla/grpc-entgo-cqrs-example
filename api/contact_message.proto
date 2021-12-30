@@ -14,22 +14,22 @@ message ContactItem {
 }
 
 message Contact {
-  int64 id = 1;
+  string uuid = 1;
   ContactItem item = 2;
   google.protobuf.Timestamp CreatedAt = 6;
   google.protobuf.Timestamp UpdatedAt = 7;
 }
 
-message GetContactReq { int64 id = 1; }
+message GetContactReq { string uuid = 1; }
 message GetContactResp { Contact contact = 1; }
 
-message GetListContactReq {
+message ListContactReq {
   message Filter { string name = 1; }
   UtilPb.QueryRange rang = 1;
   Filter filter = 2;
 }
 
-message GetListContactResp {
+message ListContactResp {
   UtilPb.QueryRange rang = 1;
   int64 total = 2;
   repeated Contact contact = 3;
@@ -44,5 +44,5 @@ message UpdateContactReq {
 }
 message UpdateContactResp { ContactItem item = 1; }
 
-message DeleteContactReq { int64 id = 1; }
+message DeleteContactReq { string uuid = 1; }
 message DeleteContactResp {}

@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/google/uuid"
 )
 
 // Contact is the model entity for the Contact schema.
@@ -16,6 +17,8 @@ type Contact struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int64 `json:"id,omitempty"`
+	// UUID holds the value of the "uuid" field.
+	UUID uuid.UUID `json:"uuid,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Phone holds the value of the "phone" field.
@@ -37,6 +40,8 @@ func (*Contact) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new(sql.NullString)
 		case contact.FieldCreateTime, contact.FieldUpdateTime:
 			values[i] = new(sql.NullTime)
+		case contact.FieldUUID:
+			values[i] = new(uuid.UUID)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Contact", columns[i])
 		}
@@ -58,6 +63,12 @@ func (c *Contact) assignValues(columns []string, values []interface{}) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			c.ID = int64(value.Int64)
+		case contact.FieldUUID:
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field uuid", values[i])
+			} else if value != nil {
+				c.UUID = *value
+			}
 		case contact.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
@@ -110,6 +121,8 @@ func (c *Contact) String() string {
 	var builder strings.Builder
 	builder.WriteString("Contact(")
 	builder.WriteString(fmt.Sprintf("id=%v", c.ID))
+	builder.WriteString(", uuid=")
+	builder.WriteString(fmt.Sprintf("%v", c.UUID))
 	builder.WriteString(", name=")
 	builder.WriteString(c.Name)
 	builder.WriteString(", phone=")

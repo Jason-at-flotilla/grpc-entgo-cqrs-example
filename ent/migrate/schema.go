@@ -11,6 +11,7 @@ var (
 	// ContactsColumns holds the columns for the "contacts" table.
 	ContactsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
+		{Name: "uuid", Type: field.TypeUUID},
 		{Name: "name", Type: field.TypeString},
 		{Name: "phone", Type: field.TypeString},
 		{Name: "create_time", Type: field.TypeTime},

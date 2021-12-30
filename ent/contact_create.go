@@ -11,6 +11,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 )
 
 // ContactCreate is the builder for creating a Contact entity.
@@ -18,6 +19,12 @@ type ContactCreate struct {
 	config
 	mutation *ContactMutation
 	hooks    []Hook
+}
+
+// SetUUID sets the "uuid" field.
+func (cc *ContactCreate) SetUUID(u uuid.UUID) *ContactCreate {
+	cc.mutation.SetUUID(u)
+	return cc
 }
 
 // SetName sets the "name" field.
@@ -137,6 +144,10 @@ func (cc *ContactCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (cc *ContactCreate) defaults() {
+	if _, ok := cc.mutation.UUID(); !ok {
+		v := contact.DefaultUUID()
+		cc.mutation.SetUUID(v)
+	}
 	if _, ok := cc.mutation.CreateTime(); !ok {
 		v := contact.DefaultCreateTime()
 		cc.mutation.SetCreateTime(v)
@@ -149,6 +160,9 @@ func (cc *ContactCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (cc *ContactCreate) check() error {
+	if _, ok := cc.mutation.UUID(); !ok {
+		return &ValidationError{Name: "uuid", err: errors.New(`ent: missing required field "uuid"`)}
+	}
 	if _, ok := cc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "name"`)}
 	}
@@ -193,6 +207,14 @@ func (cc *ContactCreate) createSpec() (*Contact, *sqlgraph.CreateSpec) {
 	if id, ok := cc.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
+	}
+	if value, ok := cc.mutation.UUID(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: contact.FieldUUID,
+		})
+		_node.UUID = value
 	}
 	if value, ok := cc.mutation.Name(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

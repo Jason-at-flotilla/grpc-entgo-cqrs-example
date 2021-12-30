@@ -10,6 +10,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/google/uuid"
+
 	"entgo.io/ent"
 )
 
@@ -31,6 +33,7 @@ type ContactMutation struct {
 	op            Op
 	typ           string
 	id            *int64
+	uuid          *uuid.UUID
 	name          *string
 	phone         *string
 	create_time   *time.Time
@@ -124,6 +127,42 @@ func (m *ContactMutation) ID() (id int64, exists bool) {
 		return
 	}
 	return *m.id, true
+}
+
+// SetUUID sets the "uuid" field.
+func (m *ContactMutation) SetUUID(u uuid.UUID) {
+	m.uuid = &u
+}
+
+// UUID returns the value of the "uuid" field in the mutation.
+func (m *ContactMutation) UUID() (r uuid.UUID, exists bool) {
+	v := m.uuid
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUUID returns the old "uuid" field's value of the Contact entity.
+// If the Contact object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ContactMutation) OldUUID(ctx context.Context) (v uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldUUID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldUUID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUUID: %w", err)
+	}
+	return oldValue.UUID, nil
+}
+
+// ResetUUID resets all changes to the "uuid" field.
+func (m *ContactMutation) ResetUUID() {
+	m.uuid = nil
 }
 
 // SetName sets the "name" field.
@@ -289,7 +328,10 @@ func (m *ContactMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ContactMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 5)
+	if m.uuid != nil {
+		fields = append(fields, contact.FieldUUID)
+	}
 	if m.name != nil {
 		fields = append(fields, contact.FieldName)
 	}
@@ -310,6 +352,8 @@ func (m *ContactMutation) Fields() []string {
 // schema.
 func (m *ContactMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case contact.FieldUUID:
+		return m.UUID()
 	case contact.FieldName:
 		return m.Name()
 	case contact.FieldPhone:
@@ -327,6 +371,8 @@ func (m *ContactMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *ContactMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case contact.FieldUUID:
+		return m.OldUUID(ctx)
 	case contact.FieldName:
 		return m.OldName(ctx)
 	case contact.FieldPhone:
@@ -344,6 +390,13 @@ func (m *ContactMutation) OldField(ctx context.Context, name string) (ent.Value,
 // type.
 func (m *ContactMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case contact.FieldUUID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUUID(v)
+		return nil
 	case contact.FieldName:
 		v, ok := value.(string)
 		if !ok {
@@ -421,6 +474,9 @@ func (m *ContactMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *ContactMutation) ResetField(name string) error {
 	switch name {
+	case contact.FieldUUID:
+		m.ResetUUID()
+		return nil
 	case contact.FieldName:
 		m.ResetName()
 		return nil

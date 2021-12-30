@@ -11,7 +11,7 @@ import (
 
 func (m *Models) ContactEntToPb(data *ent.Contact) *pb.Contact {
 	return &pb.Contact{
-		Id: data.ID,
+		Uuid: data.UUID.String(),
 		Item: &pb.ContactItem{
 			Name:  data.Name,
 			Phone: data.Phone,
@@ -42,9 +42,9 @@ func (m *Models) UpdateContact(ctx context.Context, item *pb.ContactItem) error 
 	return nil
 }
 
-func (m *Models) GetContactById(ctx context.Context, id int64) (*pb.Contact, error) {
+func (m *Models) GetContactById(ctx context.Context, uuid string) (*pb.Contact, error) {
 
-	model, err := m.ContactModel.GetById(ctx, id)
+	model, err := m.ContactModel.GetByUuid(ctx, uuid)
 	if err != nil {
 		return nil, err
 	}
@@ -52,10 +52,10 @@ func (m *Models) GetContactById(ctx context.Context, id int64) (*pb.Contact, err
 	return m.ContactEntToPb(model), nil
 }
 
-func (m *Models) GetContactList(ctx context.Context, r *utilpb.QueryRange, filter *pb.GetListContactReq_Filter) ([]*pb.Contact, int64, error) {
+func (m *Models) GetContactList(ctx context.Context, r *utilpb.QueryRange, filter *pb.ListContactReq_Filter) ([]*pb.Contact, int64, error) {
 
 	if filter == nil {
-		filter = &pb.GetListContactReq_Filter{}
+		filter = &pb.ListContactReq_Filter{}
 	}
 
 	model, err := m.ContactModel.GetByFilter(ctx, filter.Name, r)

@@ -6,6 +6,8 @@ import (
 	"cqrs-grpc-test/ent/contact"
 	"cqrs-grpc-test/ent/schema"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 // The init function reads all schema descriptors with runtime code
@@ -14,12 +16,16 @@ import (
 func init() {
 	contactFields := schema.Contact{}.Fields()
 	_ = contactFields
+	// contactDescUUID is the schema descriptor for uuid field.
+	contactDescUUID := contactFields[1].Descriptor()
+	// contact.DefaultUUID holds the default value on creation for the uuid field.
+	contact.DefaultUUID = contactDescUUID.Default.(func() uuid.UUID)
 	// contactDescCreateTime is the schema descriptor for create_time field.
-	contactDescCreateTime := contactFields[3].Descriptor()
+	contactDescCreateTime := contactFields[4].Descriptor()
 	// contact.DefaultCreateTime holds the default value on creation for the create_time field.
 	contact.DefaultCreateTime = contactDescCreateTime.Default.(func() time.Time)
 	// contactDescUpdateTime is the schema descriptor for update_time field.
-	contactDescUpdateTime := contactFields[4].Descriptor()
+	contactDescUpdateTime := contactFields[5].Descriptor()
 	// contact.DefaultUpdateTime holds the default value on creation for the update_time field.
 	contact.DefaultUpdateTime = contactDescUpdateTime.Default.(func() time.Time)
 }

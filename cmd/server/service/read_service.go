@@ -17,7 +17,7 @@ type ReadService struct {
 
 func (svr *ReadService) Get(ctx context.Context, in *pb.GetContactReq) (*pb.GetContactResp, error) {
 
-	c, err := svr.Models.GetContactById(ctx, in.Id)
+	c, err := svr.Models.GetContactById(ctx, in.Uuid)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, fmt.Sprintf("%v", err))
 	}
@@ -26,14 +26,14 @@ func (svr *ReadService) Get(ctx context.Context, in *pb.GetContactReq) (*pb.GetC
 
 }
 
-func (svr *ReadService) GetList(ctx context.Context, in *pb.GetListContactReq) (*pb.GetListContactResp, error) {
+func (svr *ReadService) List(ctx context.Context, in *pb.ListContactReq) (*pb.ListContactResp, error) {
 
 	cc, total, err := svr.Models.GetContactList(ctx, in.Rang, in.Filter)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, fmt.Sprintf("%v", err))
 	}
 
-	return &pb.GetListContactResp{
+	return &pb.ListContactResp{
 		Contact: cc,
 		Total:   total,
 		Rang:    in.Rang,

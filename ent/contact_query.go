@@ -253,12 +253,12 @@ func (cq *ContactQuery) Clone() *ContactQuery {
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		UUID uuid.UUID `json:"uuid,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Contact.Query().
-//		GroupBy(contact.FieldName).
+//		GroupBy(contact.FieldUUID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 //
@@ -280,11 +280,11 @@ func (cq *ContactQuery) GroupBy(field string, fields ...string) *ContactGroupBy 
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		UUID uuid.UUID `json:"uuid,omitempty"`
 //	}
 //
 //	client.Contact.Query().
-//		Select(contact.FieldName).
+//		Select(contact.FieldUUID).
 //		Scan(ctx, &v)
 //
 func (cq *ContactQuery) Select(fields ...string) *ContactSelect {

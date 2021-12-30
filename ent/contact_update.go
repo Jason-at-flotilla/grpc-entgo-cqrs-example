@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 )
 
 // ContactUpdate is the builder for updating Contact entities.
@@ -24,6 +25,12 @@ type ContactUpdate struct {
 // Where appends a list predicates to the ContactUpdate builder.
 func (cu *ContactUpdate) Where(ps ...predicate.Contact) *ContactUpdate {
 	cu.mutation.Where(ps...)
+	return cu
+}
+
+// SetUUID sets the "uuid" field.
+func (cu *ContactUpdate) SetUUID(u uuid.UUID) *ContactUpdate {
+	cu.mutation.SetUUID(u)
 	return cu
 }
 
@@ -144,6 +151,13 @@ func (cu *ContactUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
+	if value, ok := cu.mutation.UUID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: contact.FieldUUID,
+		})
+	}
 	if value, ok := cu.mutation.Name(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -189,6 +203,12 @@ type ContactUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *ContactMutation
+}
+
+// SetUUID sets the "uuid" field.
+func (cuo *ContactUpdateOne) SetUUID(u uuid.UUID) *ContactUpdateOne {
+	cuo.mutation.SetUUID(u)
+	return cuo
 }
 
 // SetName sets the "name" field.
@@ -331,6 +351,13 @@ func (cuo *ContactUpdateOne) sqlSave(ctx context.Context) (_node *Contact, err e
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := cuo.mutation.UUID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: contact.FieldUUID,
+		})
 	}
 	if value, ok := cuo.mutation.Name(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{

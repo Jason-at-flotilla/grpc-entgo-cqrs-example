@@ -41,7 +41,7 @@ func (svr *WriteService) Update(ctx context.Context, in *pb.UpdateContactReq) (*
 
 func (svr *WriteService) Delete(ctx context.Context, in *pb.DeleteContactReq) (*google_protobuf.Empty, error) {
 
-	err := svr.Models.ContactModel.Delete(ctx, in.Id)
+	err := svr.Models.ContactModel.Delete(ctx, in.Uuid)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, fmt.Sprintf("%v", err))
 	}

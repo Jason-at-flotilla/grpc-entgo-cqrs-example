@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/google/uuid"
 )
 
 type ContactModel struct {
@@ -31,11 +32,14 @@ func (m *ContactModel) Create(ctx context.Context, req *pb.ContactItem) (*ent.Co
 	return resp, nil
 }
 
-func (m *ContactModel) GetById(ctx context.Context, id int64) (*ent.Contact, error) {
-
+func (m *ContactModel) GetByUuid(ctx context.Context, id string) (*ent.Contact, error) {
+	uid, err := uuid.Parse(id)
+	if err != nil {
+		return nil, err
+	}
 	resp, err := m.Client.Contact.
 		Query().
-		Where(contact.ID(id)).
+		Where(contact.UUID(uid)).
 		Only(ctx)
 
 	if err != nil {
@@ -108,10 +112,14 @@ func (m *ContactModel) Update(ctx context.Context, req *pb.ContactItem) (int, er
 	return id, nil
 }
 
-func (m *ContactModel) Delete(ctx context.Context, id int64) error {
-
-	err := m.Client.Contact.
-		DeleteOneID(id).
+func (m *ContactModel) Delete(ctx context.Context, uid string) error {
+	_uid, err := uuid.Parse(uid)
+	if err != nil {
+		return err
+	}
+	_, err = m.Client.Contact.
+		Delete().
+		Where(contact.UUID(_uid)).
 		Exec(ctx)
 
 	if err != nil {

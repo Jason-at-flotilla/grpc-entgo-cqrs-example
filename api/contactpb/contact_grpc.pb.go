@@ -20,7 +20,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ReadContactServiceClient interface {
 	Get(ctx context.Context, in *GetContactReq, opts ...grpc.CallOption) (*GetContactResp, error)
-	GetList(ctx context.Context, in *GetListContactReq, opts ...grpc.CallOption) (*GetListContactResp, error)
+	List(ctx context.Context, in *ListContactReq, opts ...grpc.CallOption) (*ListContactResp, error)
 }
 
 type readContactServiceClient struct {
@@ -40,9 +40,9 @@ func (c *readContactServiceClient) Get(ctx context.Context, in *GetContactReq, o
 	return out, nil
 }
 
-func (c *readContactServiceClient) GetList(ctx context.Context, in *GetListContactReq, opts ...grpc.CallOption) (*GetListContactResp, error) {
-	out := new(GetListContactResp)
-	err := c.cc.Invoke(ctx, "/Contactpb.ReadContactService/GetList", in, out, opts...)
+func (c *readContactServiceClient) List(ctx context.Context, in *ListContactReq, opts ...grpc.CallOption) (*ListContactResp, error) {
+	out := new(ListContactResp)
+	err := c.cc.Invoke(ctx, "/Contactpb.ReadContactService/List", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +54,7 @@ func (c *readContactServiceClient) GetList(ctx context.Context, in *GetListConta
 // for forward compatibility
 type ReadContactServiceServer interface {
 	Get(context.Context, *GetContactReq) (*GetContactResp, error)
-	GetList(context.Context, *GetListContactReq) (*GetListContactResp, error)
+	List(context.Context, *ListContactReq) (*ListContactResp, error)
 	mustEmbedUnimplementedReadContactServiceServer()
 }
 
@@ -65,8 +65,8 @@ type UnimplementedReadContactServiceServer struct {
 func (UnimplementedReadContactServiceServer) Get(context.Context, *GetContactReq) (*GetContactResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
 }
-func (UnimplementedReadContactServiceServer) GetList(context.Context, *GetListContactReq) (*GetListContactResp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetList not implemented")
+func (UnimplementedReadContactServiceServer) List(context.Context, *ListContactReq) (*ListContactResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
 }
 func (UnimplementedReadContactServiceServer) mustEmbedUnimplementedReadContactServiceServer() {}
 
@@ -99,20 +99,20 @@ func _ReadContactService_Get_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ReadContactService_GetList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetListContactReq)
+func _ReadContactService_List_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListContactReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ReadContactServiceServer).GetList(ctx, in)
+		return srv.(ReadContactServiceServer).List(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/Contactpb.ReadContactService/GetList",
+		FullMethod: "/Contactpb.ReadContactService/List",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ReadContactServiceServer).GetList(ctx, req.(*GetListContactReq))
+		return srv.(ReadContactServiceServer).List(ctx, req.(*ListContactReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -129,8 +129,8 @@ var ReadContactService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ReadContactService_Get_Handler,
 		},
 		{
-			MethodName: "GetList",
-			Handler:    _ReadContactService_GetList_Handler,
+			MethodName: "List",
+			Handler:    _ReadContactService_List_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
