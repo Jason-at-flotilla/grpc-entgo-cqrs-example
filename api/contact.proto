@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package Contactpb;
+
+option go_package = "cqrs-grpc-test/api/contactpb";
+
+import "google/protobuf/empty.proto";
+import "contact_message.proto";
+
+service ReadContactService {
+  rpc Get(GetContactReq) returns (GetContactResp) {}
+  rpc GetList(GetListContactReq) returns (GetListContactResp) {}
+}
+
+service WriteContactService {
+  rpc Create(CreateContactReq) returns (CreateContactResp) {}
+  rpc Update(UpdateContactReq) returns (UpdateContactResp) {}
+  rpc Delete(DeleteContactReq) returns (google.protobuf.Empty) {}
+}

@@ -1,0 +1,20 @@
+serviceName: service
+grpc:
+  port: :5002
+  development: true
+logger:
+  level: debug
+  devMode: false
+  encoder: json
+postgres:
+  host: localhost
+  port: 5431
+  user: oem
+  password: oem
+  dbName: mytest
+  sslMode: false
+redis:
+  addr: "localhost:6379"
+  password: ""
+  db: 0
+  poolSize: 300

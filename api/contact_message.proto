@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+import "util.proto";
+
+package Contactpb;
+
+option go_package = "cqrs-grpc-test/api/contactpb";
+
+message ContactItem {
+  string name = 1;
+  string phone = 2;
+}
+
+message Contact {
+  int64 id = 1;
+  ContactItem item = 2;
+  google.protobuf.Timestamp CreatedAt = 6;
+  google.protobuf.Timestamp UpdatedAt = 7;
+}
+
+message GetContactReq { int64 id = 1; }
+message GetContactResp { Contact contact = 1; }
+
+message GetListContactReq {
+  message Filter { string name = 1; }
+  UtilPb.QueryRange rang = 1;
+  Filter filter = 2;
+}
+
+message GetListContactResp {
+  UtilPb.QueryRange rang = 1;
+  int64 total = 2;
+  repeated Contact contact = 3;
+}
+
+message CreateContactReq { ContactItem item = 1; }
+message CreateContactResp { Contact contact = 1; }
+
+message UpdateContactReq {
+  int64 id = 1;
+  ContactItem item = 2;
+}
+message UpdateContactResp { ContactItem item = 1; }
+
+message DeleteContactReq { int64 id = 1; }
+message DeleteContactResp {}
