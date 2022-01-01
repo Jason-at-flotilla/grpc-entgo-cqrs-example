@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/google/uuid"
 )
 
 type ContactModel struct {
@@ -33,7 +32,7 @@ func (m *ContactModel) Create(ctx context.Context, req *pb.ContactItem) (*ent.Co
 }
 
 func (m *ContactModel) GetByUuid(ctx context.Context, id string) (*ent.Contact, error) {
-	uid, err := uuid.Parse(id)
+	uid, err := util.UUidByStr(id)
 	if err != nil {
 		return nil, err
 	}
@@ -96,30 +95,34 @@ func (m *ContactModel) GetByFilterCount(ctx context.Context, name string) (int, 
 	return count, nil
 }
 
-func (m *ContactModel) Update(ctx context.Context, req *pb.ContactItem) (int, error) {
-
-	id, err := m.Client.Contact.
+func (m *ContactModel) Update(ctx context.Context, id string, req *pb.ContactItem) error {
+	uid, err := util.UUidByStr(id)
+	if err != nil {
+		return err
+	}
+	_, err = m.Client.Contact.
 		Update().
+		Where(contact.UUID(uid)).
 		SetName(req.Name).
 		SetPhone(req.Phone).
 		SetUpdateTime(time.Now()).
 		Save(ctx)
 
 	if err != nil {
-		return 0, err
+		return err
 	}
 
-	return id, nil
+	return nil
 }
 
-func (m *ContactModel) Delete(ctx context.Context, uid string) error {
-	_uid, err := uuid.Parse(uid)
+func (m *ContactModel) Delete(ctx context.Context, id string) error {
+	uid, err := util.UUidByStr(id)
 	if err != nil {
 		return err
 	}
 	_, err = m.Client.Contact.
 		Delete().
-		Where(contact.UUID(_uid)).
+		Where(contact.UUID(uid)).
 		Exec(ctx)
 
 	if err != nil {

@@ -43,15 +43,11 @@ func (x CacheType) Number() protoreflect.EnumNumber {
 var (
 	CacheType_name = map[int]string{
 		0: "CACHE_LOGIN_SESSION",
-		1: "DB_2",
-		2: "DB_3",
-		3: "DB_CACHE",
+		1: "DB_CACHE",
 	}
 	CacheType_value = map[string]int32{
 		"CACHE_LOGIN_SESSION": 0,
-		"DB_2":                1,
-		"DB_3":                2,
-		"DB_CACHE":            3,
+		"DB_CACHE":            1,
 	}
 )
 

@@ -39,7 +39,7 @@ message CreateContactReq { ContactItem item = 1; }
 message CreateContactResp { Contact contact = 1; }
 
 message UpdateContactReq {
-  int64 id = 1;
+  string uuid = 1;
   ContactItem item = 2;
 }
 message UpdateContactResp { ContactItem item = 1; }

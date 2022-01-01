@@ -5,7 +5,12 @@ import (
 	pb "cqrs-grpc-test/api/contactpb"
 	utilpb "cqrs-grpc-test/api/utilpb"
 	"cqrs-grpc-test/ent"
+	"cqrs-grpc-test/pkg/redis"
+	"cqrs-grpc-test/util"
+	"fmt"
 
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -32,9 +37,12 @@ func (m *Models) CreateContact(ctx context.Context, item *pb.ContactItem) (*pb.C
 	return m.ContactEntToPb(model), nil
 }
 
-func (m *Models) UpdateContact(ctx context.Context, item *pb.ContactItem) error {
+func (m *Models) UpdateContact(ctx context.Context, item *pb.ContactItem, uuid string) error {
 
-	_, err := m.ContactModel.Update(ctx, item)
+	r := redis.GetClient(int(redis.DB_CACHE))
+	r.Del(fmt.Sprintf("/contact/%s", uuid))
+
+	err := m.ContactModel.Update(ctx, uuid, item)
 	if err != nil {
 		return err
 	}
@@ -43,13 +51,25 @@ func (m *Models) UpdateContact(ctx context.Context, item *pb.ContactItem) error 
 }
 
 func (m *Models) GetContactById(ctx context.Context, uuid string) (*pb.Contact, error) {
-
-	model, err := m.ContactModel.GetByUuid(ctx, uuid)
+	item := &pb.Contact{}
+	r := redis.GetClient(int(redis.DB_CACHE))
+	v, err := r.Get(fmt.Sprintf("/contact/%s", uuid))
 	if err != nil {
-		return nil, err
+		model, err := m.ContactModel.GetByUuid(ctx, uuid)
+		if err != nil {
+			return nil, err
+		}
+		item = m.ContactEntToPb(model)
+		setValue, err := util.MarshalProto(item)
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, fmt.Sprintf("%v", err))
+		}
+		r.Set(fmt.Sprintf("/contact/%s", uuid), setValue, 0)
+		return item, nil
 	}
+	util.UnmarshalProto(v, item)
 
-	return m.ContactEntToPb(model), nil
+	return item, nil
 }
 
 func (m *Models) GetContactList(ctx context.Context, r *utilpb.QueryRange, filter *pb.ListContactReq_Filter) ([]*pb.Contact, int64, error) {
@@ -74,4 +94,18 @@ func (m *Models) GetContactList(ctx context.Context, r *utilpb.QueryRange, filte
 	}
 
 	return cc, int64(total), nil
+}
+
+func (m *Models) DeleteContact(ctx context.Context, uuid string) error {
+
+	r := redis.GetClient(int(redis.DB_CACHE))
+	r.Del(fmt.Sprintf("/contact/%s", uuid))
+
+	err := m.ContactModel.Delete(ctx, uuid)
+	if err != nil {
+		return err
+	}
+
+	return nil
+
 }

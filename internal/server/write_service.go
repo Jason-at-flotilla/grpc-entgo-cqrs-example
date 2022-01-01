@@ -30,7 +30,7 @@ func (svr *WriteService) Create(ctx context.Context, in *pb.CreateContactReq) (*
 
 func (svr *WriteService) Update(ctx context.Context, in *pb.UpdateContactReq) (*pb.UpdateContactResp, error) {
 
-	err := svr.Models.UpdateContact(ctx, in.Item)
+	err := svr.Models.UpdateContact(ctx, in.Item, in.Uuid)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, fmt.Sprintf("%v", err))
 	}
@@ -41,7 +41,7 @@ func (svr *WriteService) Update(ctx context.Context, in *pb.UpdateContactReq) (*
 
 func (svr *WriteService) Delete(ctx context.Context, in *pb.DeleteContactReq) (*google_protobuf.Empty, error) {
 
-	err := svr.Models.ContactModel.Delete(ctx, in.Uuid)
+	err := svr.Models.DeleteContact(ctx, in.Uuid)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, fmt.Sprintf("%v", err))
 	}
